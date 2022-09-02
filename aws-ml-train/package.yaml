@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'aws-ml-train
+
+  Sample SAM Template for aws-ml-train
+
+  '
+Resources:
+  DataTrainingStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri:
+        Bucket: my-tf-aws-bucket
+        Key: 5b0d736fa833350648b37c33b635aead
+      DefinitionSubstitutions:
+        DataLoadFunctionArn:
+          Fn::GetAtt:
+          - DataLoadFunction
+          - Arn
+        DataCleanFunctionArn:
+          Fn::GetAtt:
+          - DataCleanFunction
+          - Arn
+        DataPrepareFunctionArn:
+          Fn::GetAtt:
+          - DataPrepareFunction
+          - Arn
+        TrainModelFunctionArn:
+          Fn::GetAtt:
+          - TrainModelFunction
+          - Arn
+      Events:
+        HourlyTradingSchedule:
+          Type: Schedule
+          Properties:
+            Description: Schedule to run the stock trading state machine every hour
+            Enabled: false
+            Schedule: rate(1 hour)
+      Policies:
+      - LambdaInvokePolicy:
+          FunctionName:
+            Ref: DataLoadFunction
+      - LambdaInvokePolicy:
+          FunctionName:
+            Ref: DataCleanFunction
+      - LambdaInvokePolicy:
+          FunctionName:
+            Ref: DataPrepareFunction
+      - LambdaInvokePolicy:
+          FunctionName:
+            Ref: TrainModelFunction
+    Metadata:
+      SamResourceId: DataTrainingStateMachine
+  DataLoadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-tf-aws-bucket/ec76411e01b2c9d437ffa5793a125c9e
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+      - x86_64
+    Metadata:
+      SamResourceId: DataLoadFunction
+  DataCleanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-tf-aws-bucket/ec76411e01b2c9d437ffa5793a125c9e
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+      - x86_64
+    Metadata:
+      SamResourceId: DataCleanFunction
+  DataPrepareFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-tf-aws-bucket/ec76411e01b2c9d437ffa5793a125c9e
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+      - x86_64
+    Metadata:
+      SamResourceId: DataPrepareFunction
+  TrainModelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://my-tf-aws-bucket/ec76411e01b2c9d437ffa5793a125c9e
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Architectures:
+      - x86_64
+    Metadata:
+      SamResourceId: TrainModelFunction
+Outputs:
+  DataTrainingStateMachineArn:
+    Description: Stock Trading State machine ARN
+    Value:
+      Ref: DataTrainingStateMachine
+  DataTrainingStateMachineRoleArn:
+    Description: IAM Role created for Stock Trading State machine based on the specified
+      SAM Policy Templates
+    Value:
+      Fn::GetAtt:
+      - DataTrainingStateMachineRole
+      - Arn

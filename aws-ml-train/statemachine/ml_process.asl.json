@@ -1,0 +1,67 @@
+{
+    "Comment": "A state machine that does ML training.",
+    "StartAt": "DataLoad",
+    "States": {
+        "DataLoad": {
+            "Type": "Task",
+            "Resource": "${DataLoadFunctionArn}",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 15,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 1.5
+                }
+            ],
+            "Next": "DataClean"
+        },
+        "DataClean": {
+            "Type": "Task",
+            "Resource": "${DataCleanFunctionArn}",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 15,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 1.5
+                }
+            ],
+            "Next": "DataPrepare"
+        },
+        "DataPrepare": {
+            "Type": "Task",
+            "Resource": "${DataPrepareFunctionArn}",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 15,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 1.5
+                }
+            ],
+            "Next": "TrainModel"
+        },
+        "TrainModel": {
+            "Type": "Task",
+            "Resource": "${TrainModelFunctionArn}",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "IntervalSeconds": 15,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 1.5
+                }
+            ],
+            "End": true
+        }
+        
+    }
+}
