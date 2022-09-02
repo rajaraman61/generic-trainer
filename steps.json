@@ -1,0 +1,27 @@
+{
+    "Comment": "Example of ChoiceState using AWS StepFunctions",
+    "StartAt": "DataLoad",
+    "States": {
+      "DataLoad": {
+        "Type": "Task",
+        "Resource": "ARN:OF:sub-numbers",
+        "Next": "DataClean"
+      }, 
+      "DataClean": {
+        "Type" : "Task",
+        "Resource": "ARN:OF:greater-than-lambda",
+        "Next": "DataPrepare"
+      },
+      "DataPrepare": {
+        "Type" : "Task",
+        "Resource": "ARN:OF:less-than-lambda",
+        "Next": "TrainModel"
+      },
+      "TrainModel": {
+        "Type": "Task",
+        "Resource": "ARN:OF:final-state-lambda",
+        "End": true
+      }
+    }
+  }
+  
